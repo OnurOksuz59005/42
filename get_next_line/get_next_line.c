@@ -58,10 +58,24 @@ static char	*extract_line(char **buffer)
  * @param buffer The static buffer to store read data
  * @return 1 if read was successful, 0 if EOF or error
  */
+static int	append_to_buffer(char **buffer, char *read_buf)
+{
+	char	*temp;
+
+	if (!*buffer)
+		*buffer = ft_strdup(read_buf);
+	else
+	{
+		temp = ft_strjoin(*buffer, read_buf);
+		free(*buffer);
+		*buffer = temp;
+	}
+	return (1);
+}
+
 static int	read_to_buffer(int fd, char **buffer)
 {
 	char	*read_buf;
-	char	*temp;
 	ssize_t	bytes_read;
 
 	read_buf = (char *)malloc(sizeof(char) * (BUFFER_SIZE + 1));
@@ -77,14 +91,7 @@ static int	read_to_buffer(int fd, char **buffer)
 			return (0);
 		}
 		read_buf[bytes_read] = '\0';
-		if (!*buffer)
-			*buffer = ft_strdup(read_buf);
-		else
-		{
-			temp = ft_strjoin(*buffer, read_buf);
-			free(*buffer);
-			*buffer = temp;
-		}
+		append_to_buffer(buffer, read_buf);
 	}
 	free(read_buf);
 	return (1);

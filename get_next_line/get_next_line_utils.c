@@ -92,18 +92,12 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	result = (char *)malloc(sizeof(char) * (len1 + len2 + 1));
 	if (!result)
 		return (NULL);
-	i = 0;
-	while (i < len1)
-	{
+	i = -1;
+	while (++i < len1)
 		result[i] = s1[i];
-		i++;
-	}
-	j = 0;
-	while (s2[j])
-	{
+	j = -1;
+	while (++j < len2)
 		result[i + j] = s2[j];
-		j++;
-	}
 	result[i + j] = '\0';
 	return (result);
 }
