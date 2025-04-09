@@ -17,12 +17,12 @@
  * @param buffer The static buffer containing data read from fd
  * @return The extracted line (including \n) or the remaining buffer if no \n
  */
-static char	*handle_newline(char **buffer, char *newline_pos)
+static void	process_buffer_with_newline(char **buffer, char *newline_pos,
+	char **line)
 {
-	char	*line;
 	char	*temp;
 
-	line = ft_substr(*buffer, 0, newline_pos - *buffer + 1);
+	*line = ft_substr(*buffer, 0, newline_pos - *buffer + 1);
 	temp = ft_strdup(newline_pos + 1);
 	free(*buffer);
 	*buffer = temp;
@@ -31,29 +31,25 @@ static char	*handle_newline(char **buffer, char *newline_pos)
 		free(*buffer);
 		*buffer = NULL;
 	}
-	return (line);
-}
-
-static char	*handle_no_newline(char **buffer)
-{
-	char	*line;
-
-	line = ft_strdup(*buffer);
-	free(*buffer);
-	*buffer = NULL;
-	return (line);
 }
 
 static char	*extract_line(char **buffer)
 {
+	char	*line;
 	char	*newline_pos;
 
 	if (!*buffer || **buffer == '\0')
 		return (NULL);
 	newline_pos = ft_strchr(*buffer, '\n');
 	if (newline_pos)
-		return (handle_newline(buffer, newline_pos));
-	return (handle_no_newline(buffer));
+		process_buffer_with_newline(buffer, newline_pos, &line);
+	else
+	{
+		line = ft_strdup(*buffer);
+		free(*buffer);
+		*buffer = NULL;
+	}
+	return (line);
 }
 
 /**
@@ -62,25 +58,10 @@ static char	*extract_line(char **buffer)
  * @param buffer The static buffer to store read data
  * @return 1 if read was successful, 0 if EOF or error
  */
-static int	process_read_data(char **buffer, char *read_buf, ssize_t bytes_read)
-{
-	char	*temp;
-
-	read_buf[bytes_read] = '\0';
-	if (!*buffer)
-		*buffer = ft_strdup(read_buf);
-	else
-	{
-		temp = ft_strjoin(*buffer, read_buf);
-		free(*buffer);
-		*buffer = temp;
-	}
-	return (1);
-}
-
 static int	read_to_buffer(int fd, char **buffer)
 {
 	char	*read_buf;
+	char	*temp;
 	ssize_t	bytes_read;
 
 	read_buf = (char *)malloc(sizeof(char) * (BUFFER_SIZE + 1));
@@ -95,7 +76,15 @@ static int	read_to_buffer(int fd, char **buffer)
 			free(read_buf);
 			return (0);
 		}
-		process_read_data(buffer, read_buf, bytes_read);
+		read_buf[bytes_read] = '\0';
+		if (!*buffer)
+			*buffer = ft_strdup(read_buf);
+		else
+		{
+			temp = ft_strjoin(*buffer, read_buf);
+			free(*buffer);
+			*buffer = temp;
+		}
 	}
 	free(read_buf);
 	return (1);

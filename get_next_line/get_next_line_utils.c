@@ -77,12 +77,21 @@ char	*ft_strchr(const char *s, int c)
  * @param s2 The second string
  * @return A new string that is s1 followed by s2, or NULL if allocation fails
  */
-static void	copy_strings(char *result, char const *s1, char const *s2,
-	size_t len1)
+char	*ft_strjoin(char const *s1, char const *s2)
 {
+	char	*result;
+	size_t	len1;
+	size_t	len2;
 	size_t	i;
 	size_t	j;
 
+	if (!s1 || !s2)
+		return (NULL);
+	len1 = ft_strlen(s1);
+	len2 = ft_strlen(s2);
+	result = (char *)malloc(sizeof(char) * (len1 + len2 + 1));
+	if (!result)
+		return (NULL);
 	i = 0;
 	while (i < len1)
 	{
@@ -96,22 +105,6 @@ static void	copy_strings(char *result, char const *s1, char const *s2,
 		j++;
 	}
 	result[i + j] = '\0';
-}
-
-char	*ft_strjoin(char const *s1, char const *s2)
-{
-	char	*result;
-	size_t	len1;
-	size_t	len2;
-
-	if (!s1 || !s2)
-		return (NULL);
-	len1 = ft_strlen(s1);
-	len2 = ft_strlen(s2);
-	result = (char *)malloc(sizeof(char) * (len1 + len2 + 1));
-	if (!result)
-		return (NULL);
-	copy_strings(result, s1, s2, len1);
 	return (result);
 }
 
